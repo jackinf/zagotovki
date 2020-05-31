@@ -1,6 +1,5 @@
 ﻿using System;
 using FooBar.Domain.Interfaces;
-using Microsoft.eShopWeb.ApplicationCore.Entities;
 
 namespace FooBar.Domain.Entities
 {

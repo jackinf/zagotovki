@@ -1,6 +1,6 @@
 ﻿﻿using FooBar.Domain.Interfaces;
 
- namespace Microsoft.eShopWeb.ApplicationCore.Entities
+ namespace FooBar.Domain.Entities
 {
     public class CatalogBrand : BaseEntity, IAggregateRoot
     {

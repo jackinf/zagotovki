@@ -1,5 +1,7 @@
 using System;
+using FooBar.Domain.Interfaces;
 using FooBar.Infrastructure.Data;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +24,13 @@ namespace FooBar.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            
             ConfigurePersistence(services);
+            
+            services.AddMediatR(typeof(Startup));
+            
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
+            services.AddScoped<ICatalogItemRepository, CatalogItemRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
