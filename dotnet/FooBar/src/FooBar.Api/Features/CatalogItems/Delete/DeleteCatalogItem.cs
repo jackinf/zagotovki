@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace FooBar.Api.Features.CatalogItems
+namespace FooBar.Api.Features.CatalogItems.Delete
 {
     public class DeleteCatalogItem : IRequest
     {

@@ -1,4 +1,6 @@
 using System;
+using FluentValidation;
+using FooBar.Api.Features;
 using FooBar.Domain.Interfaces;
 using FooBar.Infrastructure.Data;
 using MediatR;
@@ -27,8 +29,11 @@ namespace FooBar.Api
             services.AddControllers();
             
             ConfigurePersistence(services);
-            
-            services.AddMediatR(typeof(Startup));
+
+            services.AddMediatR(typeof(Program));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TracingBehavior<,>));
+            // services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            services.AddValidatorsFromAssembly(typeof(Program).Assembly);
             
             services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
             services.AddScoped<ICatalogItemRepository, CatalogItemRepository>();

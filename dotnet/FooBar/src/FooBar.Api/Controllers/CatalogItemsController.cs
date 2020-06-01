@@ -1,5 +1,13 @@
+using System;
 using System.Threading.Tasks;
+using FluentValidation;
 using FooBar.Api.Features.CatalogItems;
+using FooBar.Api.Features.CatalogItems.Add;
+using FooBar.Api.Features.CatalogItems.Delete;
+using FooBar.Api.Features.CatalogItems.GetList;
+using FooBar.Api.Features.CatalogItems.GetSingle;
+using FooBar.Api.Features.CatalogItems.Update;
+using FooBar.Domain.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -30,40 +38,73 @@ namespace FooBar.Api.Controllers
         [Route("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var catalogItem = await mediator.Send(new GetCatalogItem(id));
-            return Ok(catalogItem);
+            try
+            {
+                return Ok(await mediator.Send(new GetCatalogItem(id)));
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ItemNotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
         }
         
         [HttpPost]
         public async Task<IActionResult> Add(AddCatalogItemViewModel viewModel)
         {
-            await mediator.Send(new AddCatalogItem(
-                viewModel.Name,
-                viewModel.Description,
-                viewModel.Price,
-                viewModel.PictureUri,
-                viewModel.CatalogTypeId,
-                viewModel.CatalogBrandId));
+            try
+            {
+                await mediator.Send(new AddCatalogItem(
+                    viewModel.Name,
+                    viewModel.Description,
+                    viewModel.Price,
+                    viewModel.PictureUri,
+                    viewModel.CatalogTypeId,
+                    viewModel.CatalogBrandId));
             
-            return Ok("An item was successfully added!");
+                return Ok("An item was successfully added!");
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
         
         [HttpPut]
         [Route("{id}")]
         public async Task<IActionResult> Update(int id, UpdateCatalogItemViewModel viewModel)
         {
-            await mediator.Send(new UpdateCatalogItem(id, viewModel.Name, viewModel.Price));
-            
-            return Ok("An item was successfully updated!");
+            try
+            {
+                await mediator.Send(new UpdateCatalogItem(id, viewModel.Name, viewModel.Price));
+                return Ok("An item was successfully updated!");
+            }
+            catch (ItemNotFoundException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
         
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await mediator.Send(new DeleteCatalogItem(id));
-            
-            return Ok("An item was successfully deleted!");
+            try
+            {
+                await mediator.Send(new DeleteCatalogItem(id));
+                return Ok("An item was successfully deleted!");
+            }
+            catch (ItemNotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
         }
     }
 }

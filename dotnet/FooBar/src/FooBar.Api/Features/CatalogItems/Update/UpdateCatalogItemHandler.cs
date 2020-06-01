@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using FooBar.Domain.Interfaces;
 using MediatR;
 
-namespace FooBar.Api.Features.CatalogItems
+namespace FooBar.Api.Features.CatalogItems.Update
 {
     public class UpdateCatalogItemHandler : IRequestHandler<UpdateCatalogItem>
     {

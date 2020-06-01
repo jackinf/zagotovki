@@ -1,7 +1,7 @@
 using FooBar.Api.ViewModels;
 using MediatR;
 
-namespace FooBar.Api.Features.CatalogItems
+namespace FooBar.Api.Features.CatalogItems.GetSingle
 {
     public class GetCatalogItem : IRequest<CatalogItemViewModel>
     {

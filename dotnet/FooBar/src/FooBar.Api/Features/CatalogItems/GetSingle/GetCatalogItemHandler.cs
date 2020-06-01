@@ -1,10 +1,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using FooBar.Api.ViewModels;
+using FooBar.Domain.Exceptions;
 using FooBar.Domain.Interfaces;
 using MediatR;
 
-namespace FooBar.Api.Features.CatalogItems
+namespace FooBar.Api.Features.CatalogItems.GetSingle
 {
     public class GetCatalogItemHandler : IRequestHandler<GetCatalogItem, CatalogItemViewModel>
     {
@@ -18,6 +19,10 @@ namespace FooBar.Api.Features.CatalogItems
         public async Task<CatalogItemViewModel> Handle(GetCatalogItem request, CancellationToken cancellationToken)
         {
             var catalogItem = await catalogItemRepository.GetByIdAsync(request.Id);
+            if (catalogItem == null)
+            {
+                throw new ItemNotFoundException($"Catalog item with {request.Id} was not found");
+            }
             
             return new CatalogItemViewModel
             {
