@@ -11,8 +11,7 @@ namespace FooBar.Infrastructure.Data
         }
 
         public DbSet<CatalogItem> CatalogItems { get; set; }
-        
-        // protected override void OnConfiguring(DbContextOptionsBuilder options)
-        //     => options.UseSqlite("DataSource=foobar.db");
+        public DbSet<CatalogBrand> CatalogBrands { get; set; }
+        public DbSet<CatalogType> CatalogTypes { get; set; }
     }
 }

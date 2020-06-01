@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FooBar.Api.Features.CatalogItems;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -19,24 +20,24 @@ namespace FooBar.Api.Controllers
         }
         
         [HttpGet]
-        public IActionResult Search(int page = 0)
+        public async Task<IActionResult> Search(int page = 0)
         {
-            var catalogItems = mediator.Send(new GetCatalogItems(10, page));
+            var catalogItems = await mediator.Send(new GetCatalogItems(10, page));
             return Ok(catalogItems);
         }
         
         [HttpGet]
         [Route("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var catalogItem = mediator.Send(new GetCatalogItem(id));
+            var catalogItem = await mediator.Send(new GetCatalogItem(id));
             return Ok(catalogItem);
         }
         
         [HttpPost]
-        public IActionResult Add(AddCatalogItemViewModel viewModel)
+        public async Task<IActionResult> Add(AddCatalogItemViewModel viewModel)
         {
-            mediator.Send(new AddCatalogItem(
+            await mediator.Send(new AddCatalogItem(
                 viewModel.Name,
                 viewModel.Description,
                 viewModel.Price,
@@ -49,18 +50,18 @@ namespace FooBar.Api.Controllers
         
         [HttpPut]
         [Route("{id}")]
-        public IActionResult Update(int id, UpdateCatalogItemViewModel viewModel)
+        public async Task<IActionResult> Update(int id, UpdateCatalogItemViewModel viewModel)
         {
-            mediator.Send(new UpdateCatalogItem(id, viewModel.Name, viewModel.Price));
+            await mediator.Send(new UpdateCatalogItem(id, viewModel.Name, viewModel.Price));
             
             return Ok("An item was successfully updated!");
         }
         
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            mediator.Send(new DeleteCatalogItem(id));
+            await mediator.Send(new DeleteCatalogItem(id));
             
             return Ok("An item was successfully deleted!");
         }

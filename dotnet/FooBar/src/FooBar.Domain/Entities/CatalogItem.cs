@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using FooBar.Domain.Interfaces;
 
 namespace FooBar.Domain.Entities
 {
+    [Table("CatalogItems")]
     public class CatalogItem : BaseEntity, IAggregateRoot
     {
         public string Name { get; private set; }
