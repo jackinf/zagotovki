@@ -22,9 +22,13 @@ namespace FooBar.Api.Features.CatalogItems
         {
             var specification = new CatalogItemsSpecification(request.ItemsPage * request.PageIndex, request.ItemsPage);
             var catalogItems = await catalogItemRepository.ListAsync(specification);
-            return catalogItems.Select(x => new CatalogItemViewModel
+            
+            return catalogItems.Select(model => new CatalogItemViewModel
             {
-                // TODO: define mapping
+                Id = model.Id,
+                Name = model.Name,
+                Price = model.Price,
+                PictureUri = model.PictureUri
             });
         }
     }
