@@ -1,5 +1,7 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FooBar.Domain.Exceptions;
 using FooBar.Domain.Interfaces;
 using MediatR;
 
@@ -17,9 +19,20 @@ namespace FooBar.Api.Features.CatalogItems.Delete
         public async Task<Unit> Handle(DeleteCatalogItem request, CancellationToken cancellationToken)
         {
             var catalogItem = await catalogItemRepository.GetByIdAsync(request.Id);
-            await catalogItemRepository.DeleteAsync(catalogItem);
-
-            return Unit.Value;
+            if (catalogItem == null)
+            {
+                throw new ItemNotFoundException($"Catalog item with {request.Id} was not found");
+            }
+            
+            try
+            {
+                await catalogItemRepository.DeleteAsync(catalogItem);
+                return Unit.Value;
+            }
+            catch (Exception)
+            {
+                throw new GeneralException($"Failed to delete an item");
+            }
         }
     }
 }

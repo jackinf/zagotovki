@@ -1,6 +1,7 @@
 using System;
 using FluentValidation;
 using FooBar.Api.Features;
+using FooBar.Domain.Entities;
 using FooBar.Domain.Interfaces;
 using FooBar.Infrastructure.Data;
 using MediatR;
@@ -31,12 +32,13 @@ namespace FooBar.Api
             ConfigurePersistence(services);
 
             services.AddMediatR(typeof(Program));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TracingBehavior<,>));
-            // services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddValidatorsFromAssembly(typeof(Program).Assembly);
             
             services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
             services.AddScoped<ICatalogItemRepository, CatalogItemRepository>();
+            services.AddScoped<IAsyncRepository<CatalogType>, EfRepository<CatalogType>>();
+            services.AddScoped<IAsyncRepository<CatalogBrand>, EfRepository<CatalogBrand>>();
             
             services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "FooBar API", Version = "v1" }));
         }

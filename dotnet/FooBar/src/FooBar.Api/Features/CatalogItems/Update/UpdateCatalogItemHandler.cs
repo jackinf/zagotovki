@@ -1,5 +1,7 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FooBar.Domain.Exceptions;
 using FooBar.Domain.Interfaces;
 using MediatR;
 
@@ -17,11 +19,22 @@ namespace FooBar.Api.Features.CatalogItems.Update
         public async Task<Unit> Handle(UpdateCatalogItem request, CancellationToken cancellationToken)
         {
             var catalogItem = await catalogItemRepository.GetByIdAsync(request.Id);
+            if (catalogItem == null)
+            {
+                throw new ItemNotFoundException($"Catalog item with {request.Id} was not found");
+            }
+            
             catalogItem.Update(request.Name, request.Price);
-            
-            await catalogItemRepository.UpdateAsync(catalogItem);
-            
-            return Unit.Value;
+
+            try
+            {
+                await catalogItemRepository.UpdateAsync(catalogItem);
+                return Unit.Value;
+            }
+            catch (Exception)
+            {
+                throw new GeneralException($"Failed to update an item");
+            }
         }
     }
 }
