@@ -4,7 +4,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{750DAB17
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FooBar.Api.UnitTests", "tests\FooBar.Api.UnitTests\FooBar.Api.UnitTests.csproj", "{A1E0E8E7-7381-48D7-919E-95549F46C372}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FooBar.IntegrationTests", "tests\FooBar.IntegrationTests\FooBar.IntegrationTests.csproj", "{C876DC6E-CC00-4289-908C-342A88C48214}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FooBar.Api.IntegrationTests", "tests\FooBar.Api.IntegrationTests\FooBar.Api.IntegrationTests.csproj", "{C876DC6E-CC00-4289-908C-342A88C48214}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6CEC57C5-424C-47AD-AE33-B4A2FFCDA0A8}"
 EndProject
@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "items", "items", "{F9D57F66
 ProjectSection(SolutionItems) = preProject
 	..\.gitignore = ..\.gitignore
 EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{D53510E1-5FE1-43B4-852A-90B0DDCD6CC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
