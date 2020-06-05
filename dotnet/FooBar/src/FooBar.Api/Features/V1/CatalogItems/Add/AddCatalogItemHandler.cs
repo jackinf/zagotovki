@@ -10,7 +10,7 @@ using FooBar.Domain.Exceptions;
 using FooBar.Domain.Interfaces;
 using MediatR;
 
-namespace FooBar.Api.Features.CatalogItems.Add
+namespace FooBar.Api.Features.V1.CatalogItems.Add
 {
     public class AddCatalogItemHandler : IRequestHandler<AddCatalogItem>
     {

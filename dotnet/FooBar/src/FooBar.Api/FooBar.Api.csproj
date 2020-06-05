@@ -26,4 +26,8 @@
     <ProjectReference Include="..\FooBar.Infrastructure\FooBar.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\V1" />
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FluentValidation;
 using FooBar.Api.Behaviors;
@@ -8,11 +9,15 @@ using FooBar.Domain.Interfaces;
 using FooBar.Infrastructure.Data;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Redis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -36,6 +41,11 @@ namespace FooBar.Api
         }
     }
     
+    public class ApiOptions
+    {
+        public string CorsPolicy { get; set; } = "CorsAllowAll";
+    }
+    
     public static class ServiceCollectionExtensions
     {
         public static void AddApi(this IServiceCollection services, IConfiguration configuration)
@@ -53,7 +63,7 @@ namespace FooBar.Api
             services.AddHealthChecks(); // TODO: check this
             AddDistributedCache(services);
             services.AddRouting(options => options.LowercaseUrls = true); // TODO: check this
-            services.AddCors(options => options.AddPolicy("CorsAllowAll", policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+            services.AddCors(options => options.AddPolicy(new ApiOptions().CorsPolicy, policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
             services.AddApiVersioning(options =>
             {
                 options.AssumeDefaultVersionWhenUnspecified = true;
@@ -69,6 +79,35 @@ namespace FooBar.Api
             
             services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "FooBar API", Version = "v1" }));
         }
+
+        public static void UseApi(this IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseCors(new ApiOptions().CorsPolicy);
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
+            });
+            
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "FooBar API V1");
+                c.RoutePrefix = string.Empty;
+            });
+        }
         
         public static void AddServices(this IServiceCollection services, IConfiguration configuration)
         {
@@ -83,6 +122,12 @@ namespace FooBar.Api
             services.AddScoped<ICatalogItemRepository, CatalogItemRepository>();
             services.AddScoped<IAsyncRepository<CatalogType>, EfRepository<CatalogType>>();
             services.AddScoped<IAsyncRepository<CatalogBrand>, EfRepository<CatalogBrand>>();
+            
+            services.AddDbContext<CatalogContext>(option 
+                => option
+                    .UseSqlite(configuration
+                    .GetConnectionString("CatalogConnectionSqlite")
+                    .Replace("{AppDir}", AppDomain.CurrentDomain.BaseDirectory)));
         }
         
         // TODO: move out of here
@@ -103,12 +148,13 @@ namespace FooBar.Api
                     options.Audience = configuration.GetSection("Auth0:Identifier").Value;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+                        NameClaimType = ClaimTypes.NameIdentifier
                     };
                 });
             return services;
         }
         
+        // TODO: move out of here
         private static IServiceCollection AddDistributedCache(IServiceCollection services, Action<DistributedCacheOptions> setupAction = null)
         {
             if (!(services.BuildServiceProvider().GetService(typeof (IConfiguration)) is IConfiguration service))

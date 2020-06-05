@@ -1,17 +1,9 @@
-using System;
-using FluentValidation;
-using FooBar.Api.Features;
-using FooBar.Domain.Entities;
-using FooBar.Domain.Interfaces;
-using FooBar.Infrastructure.Data;
-using MediatR;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Logging;
 
 namespace FooBar.Api
 {
@@ -27,44 +19,16 @@ namespace FooBar.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-            
-            ConfigurePersistence(services);
+            services.AddApi(Configuration);
             services.AddServices(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
+            app.UseApi(env);
             
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "FooBar API V1");
-                c.RoutePrefix = string.Empty;
-            });
-        }
-        
-        private void ConfigurePersistence(IServiceCollection services)
-        {
-            services.AddDbContext<CatalogContext>(c =>
-            {
-                var connectionString = Configuration.GetConnectionString("CatalogConnectionSqlite")
-                    .Replace("{AppDir}", AppDomain.CurrentDomain.BaseDirectory);
-                c.UseSqlite(connectionString);
-            });
+            logger.LogInformation(default(EventId), $"{Assembly.GetExecutingAssembly().GetName().Name} started");
         }
     }
 }

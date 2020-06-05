@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace FooBar.IntegrationTests
+namespace FooBar.Api.IntegrationTests
 {
     public class UnitTest1
     {

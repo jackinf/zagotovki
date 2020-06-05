@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using FooBar.Api.ViewModels;
 using MediatR;
 
-namespace FooBar.Api.Features.CatalogItems.GetList
+namespace FooBar.Api.Features.V1.CatalogItems.GetList
 {
     public class GetCatalogItems : IRequest<IEnumerable<CatalogItemViewModel>>
     {

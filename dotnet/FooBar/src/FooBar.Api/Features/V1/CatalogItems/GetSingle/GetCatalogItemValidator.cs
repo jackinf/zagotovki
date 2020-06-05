@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace FooBar.Api.Features.CatalogItems.GetSingle
+namespace FooBar.Api.Features.V1.CatalogItems.GetSingle
 {
     public class GetCatalogItemValidator : AbstractValidator<GetCatalogItem>
     {

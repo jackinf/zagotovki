@@ -6,7 +6,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 
-namespace FooBar.Api
+namespace FooBar.Api.Behaviors
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {

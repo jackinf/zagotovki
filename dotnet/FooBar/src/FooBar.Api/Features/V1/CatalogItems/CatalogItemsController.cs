@@ -1,21 +1,20 @@
-using System;
 using System.Threading.Tasks;
 using FluentValidation;
-using FooBar.Api.Features.CatalogItems;
-using FooBar.Api.Features.CatalogItems.Add;
-using FooBar.Api.Features.CatalogItems.Delete;
-using FooBar.Api.Features.CatalogItems.GetList;
-using FooBar.Api.Features.CatalogItems.GetSingle;
-using FooBar.Api.Features.CatalogItems.Update;
+using FooBar.Api.Features.V1.CatalogItems.Add;
+using FooBar.Api.Features.V1.CatalogItems.Delete;
+using FooBar.Api.Features.V1.CatalogItems.GetList;
+using FooBar.Api.Features.V1.CatalogItems.GetSingle;
+using FooBar.Api.Features.V1.CatalogItems.Update;
 using FooBar.Domain.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace FooBar.Api.Controllers
+namespace FooBar.Api.Features.V1.CatalogItems
 {
+    [ApiVersion("1.0")]
     [ApiController]
-    [Route("catalog-items")]
+    [Route("v{version:apiVersion}/catalog-items")]
     public class CatalogItemsController : ControllerBase
     {
         private readonly ILogger<CatalogItemsController> logger;
@@ -53,11 +52,11 @@ namespace FooBar.Api.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> Add(AddCatalogItemViewModel viewModel)
+        public async Task<IActionResult> Add([FromBody] AddCatalogItemViewModel viewModel, ApiVersion apiVersion)
         {
             try
             {
-                await mediator.Send(new AddCatalogItem(
+                var id = await mediator.Send(new AddCatalogItem(
                     viewModel.Name,
                     viewModel.Description,
                     viewModel.Price,
@@ -65,7 +64,7 @@ namespace FooBar.Api.Controllers
                     viewModel.CatalogTypeId,
                     viewModel.CatalogBrandId));
             
-                return Ok("An item was successfully added!");
+                return CreatedAtRoute(nameof(Get), new { version = apiVersion.ToString() });
             }
             catch (ValidationException e)
             {

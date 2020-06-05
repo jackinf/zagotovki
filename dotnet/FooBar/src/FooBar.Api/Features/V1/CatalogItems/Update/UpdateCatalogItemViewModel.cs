@@ -1,4 +1,4 @@
-namespace FooBar.Api.Features.CatalogItems.Update
+namespace FooBar.Api.Features.V1.CatalogItems.Update
 {
     public class UpdateCatalogItemViewModel
     {

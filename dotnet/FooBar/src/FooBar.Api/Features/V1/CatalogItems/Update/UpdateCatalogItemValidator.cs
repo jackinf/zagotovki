@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace FooBar.Api.Features.CatalogItems.Update
+namespace FooBar.Api.Features.V1.CatalogItems.Update
 {
     public class UpdateCatalogItemValidator : AbstractValidator<UpdateCatalogItem>
     {

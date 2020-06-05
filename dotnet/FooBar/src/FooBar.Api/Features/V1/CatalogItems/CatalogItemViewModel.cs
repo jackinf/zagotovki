@@ -1,4 +1,4 @@
-namespace FooBar.Api.ViewModels
+namespace FooBar.Api.Features.V1.CatalogItems
 {
     public class CatalogItemViewModel
     {

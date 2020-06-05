@@ -7,7 +7,7 @@ using FooBar.Domain.Interfaces;
 using FooBar.Domain.Specifications;
 using MediatR;
 
-namespace FooBar.Api.Features.CatalogItems.GetList
+namespace FooBar.Api.Features.V1.CatalogItems.GetList
 {
     public class GetCatalogItemsHandler : IRequestHandler<GetCatalogItems, IEnumerable<CatalogItemViewModel>>
     {
