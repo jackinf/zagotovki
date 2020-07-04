@@ -13,14 +13,13 @@ using Microsoft.Extensions.Logging;
 namespace FooBar.Api.Features.V1.CatalogItems
 {
     [ApiVersion("1.0")]
-    [ApiVersion("0.9", Deprecated = true )]
     [ApiController]
     [Route("v{version:apiVersion}/catalog-items")]
     public class CatalogItemsController : Controller
     {
         private readonly ILogger<CatalogItemsController> logger;
         private readonly IMediator mediator;
-
+        
         public CatalogItemsController(ILogger<CatalogItemsController> logger, IMediator mediator)
         {
             this.logger = logger;
