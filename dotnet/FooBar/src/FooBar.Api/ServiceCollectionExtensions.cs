@@ -1,10 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FluentValidation;
 using FooBar.Api.Behaviors;
+using FooBar.Api.Infrastructure.Swagger;
 using FooBar.Domain.Entities;
+using FooBar.Domain.Exceptions;
 using FooBar.Domain.Interfaces;
 using FooBar.Infrastructure.Data;
 using MediatR;
@@ -12,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Redis;
@@ -20,7 +26,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace FooBar.Api
 {
@@ -62,25 +68,34 @@ namespace FooBar.Api
             
             services.AddHealthChecks(); // TODO: check this
             AddDistributedCache(services);
-            services.AddRouting(options => options.LowercaseUrls = true); // TODO: check this
+            services.AddRouting(); // TODO: check this
             services.AddCors(options => options.AddPolicy(new ApiOptions().CorsPolicy, policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
-            services.AddApiVersioning(options =>
-            {
-                options.AssumeDefaultVersionWhenUnspecified = true;
-                options.DefaultApiVersion = new ApiVersion(1, 0);
-            });
-            
-            // Required for the Swagger to recognize API versions
-            services.AddVersionedApiExplorer(options =>
-            {
-                options.SubstituteApiVersionInUrl = true;
-                options.GroupNameFormat = options.SubstitutionFormat;
-            });
-            
-            services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "FooBar API", Version = "v1" }));
+
+            services.AddApiVersioning(
+                options =>
+                {
+                    // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
+                    options.ReportApiVersions = true;
+                    options.DefaultApiVersion = new ApiVersion(1, 0);
+                });
+            services.AddVersionedApiExplorer(
+                options =>
+                {
+                    // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+                    // note: the specified format code will format the version as "'v'major[.minor][-status]"
+                    // options.GroupNameFormat = "'v'VVV";
+                    options.GroupNameFormat = $"'v'{options.SubstitutionFormat}";
+
+                    // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
+                    // can also be used to control the format of the API version in route templates
+                    options.SubstituteApiVersionInUrl = true;
+                    options.DefaultApiVersion = new ApiVersion(1, 0);
+                });
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+            services.AddSwaggerGen(options => options.OperationFilter<SwaggerDefaultValues>());
         }
 
-        public static void UseApi(this IApplicationBuilder app, IWebHostEnvironment env)
+        public static void UseApi(this IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionProvider)
         {
             if (env.IsDevelopment())
             {
@@ -102,11 +117,16 @@ namespace FooBar.Api
             });
             
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "FooBar API V1");
-                c.RoutePrefix = string.Empty;
-            });
+            app.UseSwaggerUI(
+                options =>
+                {
+                    options.RoutePrefix = string.Empty;
+                    // build a swagger endpoint for each discovered API version
+                    foreach ( var description in apiVersionProvider.ApiVersionDescriptions )
+                    {
+                        options.SwaggerEndpoint( $"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant() );
+                    }
+                });
         }
         
         public static void AddServices(this IServiceCollection services, IConfiguration configuration)
@@ -161,6 +181,11 @@ namespace FooBar.Api
                 throw new Exception("Could not resolve service: IConfiguration");
             
             var cacheOptions = service.GetSection("DistributedCacheOptions").Get<DistributedCacheOptions>();
+            if (cacheOptions == null)
+            {
+                throw new MissingConfigurationException("DistributedCacheOptions is not defined in appsettings.json");
+            }
+            
             setupAction?.Invoke(cacheOptions);
             
             if (cacheOptions.UseMemoryCache)

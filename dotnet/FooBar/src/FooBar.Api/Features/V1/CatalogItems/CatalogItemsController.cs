@@ -13,9 +13,10 @@ using Microsoft.Extensions.Logging;
 namespace FooBar.Api.Features.V1.CatalogItems
 {
     [ApiVersion("1.0")]
+    [ApiVersion("0.9", Deprecated = true )]
     [ApiController]
     [Route("v{version:apiVersion}/catalog-items")]
-    public class CatalogItemsController : ControllerBase
+    public class CatalogItemsController : Controller
     {
         private readonly ILogger<CatalogItemsController> logger;
         private readonly IMediator mediator;
@@ -33,8 +34,7 @@ namespace FooBar.Api.Features.V1.CatalogItems
             return Ok(catalogItems);
         }
         
-        [HttpGet]
-        [Route("{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             try
@@ -72,8 +72,7 @@ namespace FooBar.Api.Features.V1.CatalogItems
             }
         }
         
-        [HttpPut]
-        [Route("{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateCatalogItemViewModel viewModel)
         {
             try
@@ -91,8 +90,7 @@ namespace FooBar.Api.Features.V1.CatalogItems
             }
         }
         
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try
