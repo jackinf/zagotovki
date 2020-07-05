@@ -9,16 +9,16 @@ namespace FooBar.Api.Features.V1.CatalogItems.Delete
 {
     public class DeleteCatalogItemHandler : IRequestHandler<DeleteCatalogItem>
     {
-        private readonly ICatalogItemRepository catalogItemRepository;
+        private readonly ICatalogItemRepository _catalogItemRepository;
 
         public DeleteCatalogItemHandler(ICatalogItemRepository catalogItemRepository)
         {
-            this.catalogItemRepository = catalogItemRepository;
+            _catalogItemRepository = catalogItemRepository;
         }
         
         public async Task<Unit> Handle(DeleteCatalogItem request, CancellationToken cancellationToken)
         {
-            var catalogItem = await catalogItemRepository.GetByIdAsync(request.Id);
+            var catalogItem = await _catalogItemRepository.GetByIdAsync(request.Id);
             if (catalogItem == null)
             {
                 throw new ItemNotFoundException($"Catalog item with {request.Id} was not found");
@@ -26,12 +26,12 @@ namespace FooBar.Api.Features.V1.CatalogItems.Delete
             
             try
             {
-                await catalogItemRepository.DeleteAsync(catalogItem);
+                await _catalogItemRepository.DeleteAsync(catalogItem);
                 return Unit.Value;
             }
             catch (Exception)
             {
-                throw new GeneralException($"Failed to delete an item");
+                throw new GeneralException($"Failed to delete an item with id {request.Id}");
             }
         }
     }

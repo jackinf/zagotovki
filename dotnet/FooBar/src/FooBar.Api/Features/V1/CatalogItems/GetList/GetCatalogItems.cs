@@ -4,6 +4,9 @@ using MediatR;
 
 namespace FooBar.Api.Features.V1.CatalogItems.GetList
 {
+    /// <summary>
+    /// Handled by <see cref="GetCatalogItemsHandler"/>
+    /// </summary>
     public class GetCatalogItems : IRequest<IEnumerable<CatalogItemViewModel>>
     {
         public int ItemsPage { get; }

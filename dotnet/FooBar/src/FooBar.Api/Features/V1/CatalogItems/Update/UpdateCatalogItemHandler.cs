@@ -9,16 +9,16 @@ namespace FooBar.Api.Features.V1.CatalogItems.Update
 {
     public class UpdateCatalogItemHandler : IRequestHandler<UpdateCatalogItem>
     {
-        private readonly ICatalogItemRepository catalogItemRepository;
+        private readonly ICatalogItemRepository _catalogItemRepository;
 
         public UpdateCatalogItemHandler(ICatalogItemRepository catalogItemRepository)
         {
-            this.catalogItemRepository = catalogItemRepository;
+            _catalogItemRepository = catalogItemRepository;
         }
         
         public async Task<Unit> Handle(UpdateCatalogItem request, CancellationToken cancellationToken)
         {
-            var catalogItem = await catalogItemRepository.GetByIdAsync(request.Id);
+            var catalogItem = await _catalogItemRepository.GetByIdAsync(request.Id);
             if (catalogItem == null)
             {
                 throw new ItemNotFoundException($"Catalog item with {request.Id} was not found");
@@ -28,7 +28,7 @@ namespace FooBar.Api.Features.V1.CatalogItems.Update
 
             try
             {
-                await catalogItemRepository.UpdateAsync(catalogItem);
+                await _catalogItemRepository.UpdateAsync(catalogItem);
                 return Unit.Value;
             }
             catch (Exception)

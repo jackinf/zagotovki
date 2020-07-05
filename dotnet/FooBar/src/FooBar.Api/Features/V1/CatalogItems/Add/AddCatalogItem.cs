@@ -2,7 +2,10 @@
 
 namespace FooBar.Api.Features.V1.CatalogItems.Add
 {
-    public class AddCatalogItem : IRequest
+    /// <summary>
+    /// Handled by <see cref="AddCatalogItemHandler"/>
+    /// </summary>
+    public class AddCatalogItem : IRequest<int>
     {
         public string Name { get; }
         public string Description { get; }

@@ -2,6 +2,9 @@ using MediatR;
 
 namespace FooBar.Api.Features.V1.CatalogItems.Update
 {
+    /// <summary>
+    /// Handled by <see cref="UpdateCatalogItemHandler"/>
+    /// </summary>
     public class UpdateCatalogItem : IRequest
     {
         public int Id { get; }

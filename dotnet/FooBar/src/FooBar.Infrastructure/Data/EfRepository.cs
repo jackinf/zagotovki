@@ -14,66 +14,53 @@ namespace FooBar.Infrastructure.Data
     /// <typeparam name="T"></typeparam>
     public class EfRepository<T> : IAsyncRepository<T> where T : BaseEntity, IAggregateRoot
     {
-        protected readonly CatalogContext _dbContext;
+        // ReSharper disable once MemberCanBePrivate.Global
+        protected readonly CatalogContext DbContext;
 
         public EfRepository(CatalogContext dbContext)
         {
-            _dbContext = dbContext;
+            DbContext = dbContext;
         }
 
-        public virtual async Task<T> GetByIdAsync(int id)
-        {
-            return await _dbContext.Set<T>().FindAsync(id);
-        }
+        public virtual async Task<T> GetByIdAsync(int id) 
+            => await DbContext.Set<T>().FindAsync(id);
 
-        public async Task<IReadOnlyList<T>> ListAllAsync()
-        {
-            return await _dbContext.Set<T>().ToListAsync();
-        }
+        public async Task<IReadOnlyList<T>> ListAllAsync() 
+            => await DbContext.Set<T>().ToListAsync();
 
-        public async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec)
-        {
-            return await ApplySpecification(spec).ToListAsync();
-        }
+        public async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec) 
+            => await ApplySpecification(spec).ToListAsync();
 
-        public async Task<int> CountAsync(ISpecification<T> spec)
-        {
-            return await ApplySpecification(spec).CountAsync();
-        }
+        public async Task<int> CountAsync(ISpecification<T> spec) 
+            => await ApplySpecification(spec).CountAsync();
 
         public async Task<T> AddAsync(T entity)
         {
-            await _dbContext.Set<T>().AddAsync(entity);
-            await _dbContext.SaveChangesAsync();
+            await DbContext.Set<T>().AddAsync(entity);
+            await DbContext.SaveChangesAsync();
 
             return entity;
         }
 
         public async Task UpdateAsync(T entity)
         {
-            _dbContext.Entry(entity).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync();
+            DbContext.Entry(entity).State = EntityState.Modified;
+            await DbContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(T entity)
         {
-            _dbContext.Set<T>().Remove(entity);
-            await _dbContext.SaveChangesAsync();
+            DbContext.Set<T>().Remove(entity);
+            await DbContext.SaveChangesAsync();
         }
 
-        public async Task<T> FirstAsync(ISpecification<T> spec)
-        {
-            return await ApplySpecification(spec).FirstAsync();
-        }
+        public async Task<T> FirstAsync(ISpecification<T> spec) 
+            => await ApplySpecification(spec).FirstAsync();
 
-        public async Task<T> FirstOrDefaultAsync(ISpecification<T> spec)
-        {
-            return await ApplySpecification(spec).FirstOrDefaultAsync();
-        }
+        public async Task<T> FirstOrDefaultAsync(ISpecification<T> spec) 
+            => await ApplySpecification(spec).FirstOrDefaultAsync();
 
-        private IQueryable<T> ApplySpecification(ISpecification<T> spec)
-        {
-            return SpecificationEvaluator<T>.GetQuery(_dbContext.Set<T>().AsQueryable(), spec);
-        }
+        private IQueryable<T> ApplySpecification(ISpecification<T> spec) 
+            => SpecificationEvaluator<T>.GetQuery(DbContext.Set<T>().AsQueryable(), spec);
     }
 }

@@ -17,19 +17,19 @@ namespace FooBar.Api.Features.V1.CatalogItems
     [Route("v{version:apiVersion}/catalog-items")]
     public class CatalogItemsController : Controller
     {
-        private readonly ILogger<CatalogItemsController> logger;
-        private readonly IMediator mediator;
+        private readonly ILogger<CatalogItemsController> _logger;
+        private readonly IMediator _mediator;
         
         public CatalogItemsController(ILogger<CatalogItemsController> logger, IMediator mediator)
         {
-            this.logger = logger;
-            this.mediator = mediator;
+            _logger = logger;
+            _mediator = mediator;
         }
         
         [HttpGet]
         public async Task<IActionResult> Search(int page = 0)
         {
-            var catalogItems = await mediator.Send(new GetCatalogItems(10, page));
+            var catalogItems = await _mediator.Send(new GetCatalogItems(10, page));
             return Ok(catalogItems);
         }
         
@@ -38,7 +38,7 @@ namespace FooBar.Api.Features.V1.CatalogItems
         {
             try
             {
-                return Ok(await mediator.Send(new GetCatalogItem(id)));
+                return Ok(await _mediator.Send(new GetCatalogItem(id)));
             }
             catch (ValidationException e)
             {
@@ -55,7 +55,7 @@ namespace FooBar.Api.Features.V1.CatalogItems
         {
             try
             {
-                var id = await mediator.Send(new AddCatalogItem(
+                var id = await _mediator.Send(new AddCatalogItem(
                     viewModel.Name,
                     viewModel.Description,
                     viewModel.Price,
@@ -63,7 +63,7 @@ namespace FooBar.Api.Features.V1.CatalogItems
                     viewModel.CatalogTypeId,
                     viewModel.CatalogBrandId));
             
-                return CreatedAtRoute(nameof(Get), new { version = apiVersion.ToString() });
+                return CreatedAtRoute(nameof(Get), new { version = apiVersion.ToString(), id });
             }
             catch (ValidationException e)
             {
@@ -76,7 +76,7 @@ namespace FooBar.Api.Features.V1.CatalogItems
         {
             try
             {
-                await mediator.Send(new UpdateCatalogItem(id, viewModel.Name, viewModel.Price));
+                await _mediator.Send(new UpdateCatalogItem(id, viewModel.Name, viewModel.Price));
                 return Ok("An item was successfully updated!");
             }
             catch (ItemNotFoundException e)
@@ -94,7 +94,7 @@ namespace FooBar.Api.Features.V1.CatalogItems
         {
             try
             {
-                await mediator.Send(new DeleteCatalogItem(id));
+                await _mediator.Send(new DeleteCatalogItem(id));
                 return Ok("An item was successfully deleted!");
             }
             catch (ItemNotFoundException e)

@@ -1,4 +1,4 @@
-﻿﻿namespace TimeChimp.Backend.Assessment.UnitTests.Abstract
+﻿﻿namespace FooBar.Api.UnitTests.Abstract
 {
     public abstract class ServiceFixture
     {

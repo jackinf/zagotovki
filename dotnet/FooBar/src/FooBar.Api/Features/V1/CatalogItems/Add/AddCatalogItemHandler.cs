@@ -12,23 +12,23 @@ using MediatR;
 
 namespace FooBar.Api.Features.V1.CatalogItems.Add
 {
-    public class AddCatalogItemHandler : IRequestHandler<AddCatalogItem>
+    public class AddCatalogItemHandler : IRequestHandler<AddCatalogItem, int>
     {
-        private readonly ICatalogItemRepository catalogItemRepository;
-        private readonly IAsyncRepository<CatalogBrand> catalogBrandRepository;
-        private readonly IAsyncRepository<CatalogType> catalogTypeRepository;
+        private readonly ICatalogItemRepository _catalogItemRepository;
+        private readonly IAsyncRepository<CatalogBrand> _catalogBrandRepository;
+        private readonly IAsyncRepository<CatalogType> _catalogTypeRepository;
 
         public AddCatalogItemHandler(
             ICatalogItemRepository catalogItemRepository,
             IAsyncRepository<CatalogBrand> catalogBrandRepository,
             IAsyncRepository<CatalogType> catalogTypeRepository)
         {
-            this.catalogItemRepository = catalogItemRepository;
-            this.catalogBrandRepository = catalogBrandRepository;
-            this.catalogTypeRepository = catalogTypeRepository;
+            _catalogItemRepository = catalogItemRepository;
+            _catalogBrandRepository = catalogBrandRepository;
+            _catalogTypeRepository = catalogTypeRepository;
         }
         
-        public async Task<Unit> Handle(AddCatalogItem request, CancellationToken cancellationToken)
+        public async Task<int> Handle(AddCatalogItem request, CancellationToken cancellationToken)
         {
             await Validate(request);
 
@@ -42,8 +42,8 @@ namespace FooBar.Api.Features.V1.CatalogItems.Add
 
             try
             {
-                await catalogItemRepository.AddAsync(catalogItem);
-                return Unit.Value;
+                var added = await _catalogItemRepository.AddAsync(catalogItem);
+                return added.Id;
             }
             catch (Exception)
             {
@@ -54,16 +54,16 @@ namespace FooBar.Api.Features.V1.CatalogItems.Add
         private async Task Validate(AddCatalogItem request)
         {
             var validationFailures = new List<ValidationFailure>();
-            var catalogBrand = await catalogBrandRepository.GetByIdAsync(request.CatalogBrandId);
+            var catalogBrand = await _catalogBrandRepository.GetByIdAsync(request.CatalogBrandId);
             if (catalogBrand == null)
             {
-                validationFailures.Add(new ValidationFailure(nameof(request.CatalogBrandId), $"Item with id {request.CatalogBrandId} does not exist in DB"));
+                validationFailures.Add(new ValidationFailure(nameof(request.CatalogBrandId), $"Catalog Brand with id {request.CatalogBrandId} does not exist in DB"));
             }
 
-            var catalogType = await catalogTypeRepository.GetByIdAsync(request.CatalogTypeId);
+            var catalogType = await _catalogTypeRepository.GetByIdAsync(request.CatalogTypeId);
             if (catalogType == null)
             {
-                validationFailures.Add(new ValidationFailure(nameof(request.CatalogTypeId), $"Item with id {request.CatalogTypeId} does not exist in DB"));
+                validationFailures.Add(new ValidationFailure(nameof(request.CatalogTypeId), $"Catalog Type with id {request.CatalogTypeId} does not exist in DB"));
             }
 
             if (validationFailures.Any())

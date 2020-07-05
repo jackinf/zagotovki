@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using FooBar.Api.Features.V1.CatalogItems;
 using FooBar.Api.Features.V1.CatalogItems.GetList;
+using FooBar.Api.UnitTests.Abstract;
 using FooBar.Api.UnitTests.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Stashbox.Mocking.Moq;
-using TimeChimp.Backend.Assessment.UnitTests.Abstract;
 using Xunit;
 
 namespace FooBar.Api.UnitTests.Features.V1.CatalogItems

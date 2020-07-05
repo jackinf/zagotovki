@@ -10,18 +10,18 @@ namespace FooBar.Api.Behaviors
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
-        private readonly IEnumerable<IValidator<TRequest>> validators;
+        private readonly IEnumerable<IValidator<TRequest>> _validators;
 
         public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
         {
-            this.validators = validators;
+            _validators = validators;
         }
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
             var context = new ValidationContext(request);
             var validationResults = new List<ValidationResult>();
-            foreach (var validator in validators)
+            foreach (var validator in _validators)
             {
                 var validationResult = await validator.ValidateAsync(context, cancellationToken);
                 validationResults.Add(validationResult);

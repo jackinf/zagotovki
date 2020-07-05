@@ -1,6 +1,6 @@
 ﻿﻿using Xunit;
 
-namespace TimeChimp.Backend.Assessment.UnitTests.Abstract
+ namespace FooBar.Api.UnitTests.Abstract
 {
     public abstract class TestBase<T> : IClassFixture<T> where T : ServiceFixture
     {

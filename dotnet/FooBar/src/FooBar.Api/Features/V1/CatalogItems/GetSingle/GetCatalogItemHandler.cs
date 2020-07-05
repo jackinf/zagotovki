@@ -9,16 +9,16 @@ namespace FooBar.Api.Features.V1.CatalogItems.GetSingle
 {
     public class GetCatalogItemHandler : IRequestHandler<GetCatalogItem, CatalogItemViewModel>
     {
-        private readonly ICatalogItemRepository catalogItemRepository;
+        private readonly ICatalogItemRepository _catalogItemRepository;
 
         public GetCatalogItemHandler(ICatalogItemRepository catalogItemRepository)
         {
-            this.catalogItemRepository = catalogItemRepository;
+            _catalogItemRepository = catalogItemRepository;
         }
         
         public async Task<CatalogItemViewModel> Handle(GetCatalogItem request, CancellationToken cancellationToken)
         {
-            var catalogItem = await catalogItemRepository.GetByIdAsync(request.Id);
+            var catalogItem = await _catalogItemRepository.GetByIdAsync(request.Id);
             if (catalogItem == null)
             {
                 throw new ItemNotFoundException($"Catalog item with {request.Id} was not found");
